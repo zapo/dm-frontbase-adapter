@@ -92,12 +92,8 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
 
     result.inject([]) do |arr, record|
       
-      record = Hash[*columns.zip(record).flatten]
-      
-      record.each do |column, value|
-        
-        if props
-          prop = props.find {|prop| prop.field.to_sym == column.to_sym }
+      record = Hash[*columns.zip(record).flatten].inject({}) do |hash, (column, value)| 
+        if props && (prop = props.find {|prop| prop.field.to_sym == column.to_sym })
           
           case
           when prop.is_a?(::DataMapper::Property::Boolean)
@@ -117,6 +113,8 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
           value = value.to_s.force_encoding("ISO-8859-1").encode("UTF-8")
         end
         
+        hash[column] = value
+        hash
       end
       arr << record
       arr
@@ -126,8 +124,6 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
   def describe storage_name
     with_connection do |connection|
       response = connection.describe storage_name
-      
-      p response.num_rows
     end
   end
   
