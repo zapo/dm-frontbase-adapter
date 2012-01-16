@@ -97,10 +97,15 @@ class FrontbaseAdapter
         return value == DataMapper::Property::Boolean::TRUE ? 'TRUE' : 'FALSE'
       end
 
-      case value
-      when Array then "(#{value.map {|v| quote_value(v, property)}.join(", ")})"
-      when NilClass then "NULL"
-      else "'#{value.to_s.gsub(/'/, "\\'").gsub(/\\/, %{\\\\})}'"
+      case
+      when value.kind_of?(Array)
+        "(#{value.map {|v| quote_value(v, property)}.join(", ")})"
+      when value.kind_of?(NilClass)
+        "NULL"
+      when value.kind_of?(String)
+        "'#{value.to_s.gsub(/'/, "\\'").gsub(/\\/, %{\\\\})}'"
+      else
+        value.to_s
       end
     end
   end
