@@ -53,6 +53,7 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
     
     def close
       connection.close
+      @connection = nil
     end
 
   end
