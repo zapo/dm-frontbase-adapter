@@ -1,11 +1,9 @@
 require 'dm-frontbase-adapter/connection'
-require 'dm-frontbase-adapter/sql'
+require 'dm-frontbase-adapter/sql_query'
 
 
 class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
   
-  include SQL
-
   # cache data per operation accessor
   attr_accessor :data
   
@@ -49,35 +47,9 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
   # Returns a filtered data hash built from the query model operation returned xml
   def read(query)
 
-    repository    = query.repository
-    model_name    = query.model.name
-    properties    = query.fields
-    conditions    = query.conditions.map {|c| conditions_statement(c, repository)}.compact.join(") AND (")
-
-    storage_name = model_name
-
-    # get model storage name
-    if query.model.storage_names.has_key? repository.name.to_sym
-      if !query.model.storage_names[repository.name.to_sym].nil?
-        storage_name = query.model.storage_names[repository.name.to_sym]
-      end
-    end
+    properties = query.properties
     
-    statement =  "SELECT #{columns_statements(properties, repository)}"
-    statement << " FROM #{quote_name(storage_name)}"
-    statement << " WHERE (#{conditions})" unless conditions.empty?
-    statement << " ORDER BY #{order(query.order[0])}" unless query.order.nil? or query.order.empty?
-    statement << ";"
-    
-    if query.limit || (query.limit && query.offset > 0)
-
-      replacement = "SELECT TOP(" 
-      replacement << "#{query.offset.to_i}," if query.limit && query.offset > 0
-      replacement << "#{query.limit.to_i}"   if query.limit 
-      replacement << ")"
-
-      statement.gsub!('SELECT', replacement)
-    end
+    statement = SQLQuery.new(query, :select).to_s
     
     log statement
     
@@ -125,7 +97,7 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
   
   def describe storage_name
     with_connection do |connection|
-      response = connection.describe storage_name
+      connection.describe storage_name
     end
   end
   
