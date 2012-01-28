@@ -21,7 +21,7 @@ class FrontbaseAdapter
       
       @columns    = columns_statement @query.fields
       
-      @from       = quote_name(@query.model.storage_name(@query.repository))
+      @from       = quote_name(@query.model.storage_name(@query.repository.name))
     end
     
     def order_statement orders
