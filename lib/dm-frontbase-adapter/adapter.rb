@@ -81,11 +81,11 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
     
     log statement
     
-    with_connection { |connection|
+    records = with_connection { |connection|
       response_to_a(connection.query(statement), properties)
-    }.map {|hash| 
-      query.model.load(hash, query)
     }
+    
+    query.model.load(records, query)
   end
   
   def response_to_a response, props = nil
