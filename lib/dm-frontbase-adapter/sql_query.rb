@@ -19,7 +19,7 @@ class FrontbaseAdapter
       @order      = (@query.order      && !@query.order.empty?) ?
         order_statement(@query.order) : ''
       
-      @columns    = columns_statement @query.properties
+      @columns    = columns_statement @query.fields
       
       @from       = quote_name(@query.model.storage_name(@query.repository))
     end

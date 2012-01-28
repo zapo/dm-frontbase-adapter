@@ -47,7 +47,7 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
   # Returns a filtered data hash built from the query model operation returned xml
   def read(query)
 
-    properties = query.properties
+    properties = query.fields
     
     statement = SQLQuery.new(query, :select).to_s
     
