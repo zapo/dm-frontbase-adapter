@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
   s.add_runtime_dependency 'ruby-frontbase'
-  s.add_dependency "dm-core",        "~> 1.1.0"
-  s.add_dependency "dm-validations", "~> 1.1.0"
-  s.add_dependency "dm-types",       "~> 1.1.0"
+  s.add_dependency "dm-core"
+  s.add_dependency "dm-validations"
+  s.add_dependency "dm-types"
 end
