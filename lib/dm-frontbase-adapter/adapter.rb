@@ -22,6 +22,7 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
 
     # store our options in a hash :sym => value
     @options = options.inject({}) {|memo, (k,v)| memo[k.to_sym] = v; memo}
+    @options[:encoding] ||= 'iso-8859-1'
     
     # initialize abstract adapter
     super(name, @options)
@@ -57,7 +58,7 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
       response_to_a(connection.query(statement), properties)
     }
     
-    query.model.load(records, query)
+    query.filter_records(records)
   end
   
   def response_to_a response, props = nil
@@ -71,20 +72,20 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
           
           case
           when prop.is_a?(::DataMapper::Property::Boolean)
-            value = case value
-            when 1.0, 1, true, "true"
+            value = case
+            when [1.0, 1, true, "true"].include?(value)
               true
             else
               false
             end
           when prop.kind_of?(::DataMapper::Property::String)
-            value = value.to_s.force_encoding("ISO-8859-1").encode("UTF-8")
+            value = value.to_s.force_encoding(@options[:encoding]).encode("UTF-8")
           end
           
           value = prop.typecast(value)
           
         elsif value.kind_of? String
-          value = value.to_s.force_encoding("ISO-8859-1").encode("UTF-8")
+          value = value.to_s.force_encoding(@options[:encoding]).encode("UTF-8")
         end
         
         hash[column] = value

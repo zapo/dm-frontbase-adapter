@@ -13,7 +13,8 @@ class FrontbaseAdapter
     end
     
     def setup_statement
-      @conditions = (@query.conditions && !@query.conditions.empty?) ?
+            
+      @conditions = (@query.conditions) ?
         conditions_statement(@query.conditions) : ''
       
       @order      = (@query.order      && !@query.order.empty?) ?
@@ -39,7 +40,7 @@ class FrontbaseAdapter
       if @type == :select
         statement <<  "SELECT   #{columns}"
         statement << " FROM     #{from}"
-        statement << " WHERE    #{conditions}"  unless conditions.empty?
+        statement << " WHERE    #{conditions}"  unless conditions.to_s.empty?
         statement << " ORDER BY #{order}"       unless order.empty?
         statement << ";"
 
@@ -93,14 +94,14 @@ class FrontbaseAdapter
     end
     
     def include_operator(value)
-      case operand
+      case value
       when Array then 'IN'
       when Range then 'BETWEEN'
       end
     end
 
     def property_to_column_name(prop)
-      case prop
+      res = case prop
       when DataMapper::Property
         quote_name(prop.field)
       when DataMapper::Query::Path
@@ -108,6 +109,8 @@ class FrontbaseAdapter
         names = rels.map {|r| storage_name(r, @query.repository) }.join(".")
         "#{names}.#{quote_name(prop.field)}"
       end
+
+      res
     end
     
     def quote_name(name)
