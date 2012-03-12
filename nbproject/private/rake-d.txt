@@ -1,3 +1,0 @@
-build=Build dm-frontbase-adapter-1.1.0.gem into the pkg directory
-install=Build and install dm-frontbase-adapter-1.1.0.gem into system gems
-release=Create tag v1.1.0 and build and push dm-frontbase-adapter-1.1.0.gem to Rubygems

@@ -27,10 +27,6 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
     # initialize abstract adapter
     super(name, @options)
   end
-  
-  def log msg
-    DataMapper.logger.info "FrontbaseAdapter: #{msg}"
-  end
 
   def connection
     @connection ||= FrontbaseAdapter::Connection.new(@options)
@@ -79,13 +75,13 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
               false
             end
           when prop.kind_of?(::DataMapper::Property::String)
-            value = value.to_s.force_encoding(@options[:encoding]).encode("UTF-8")
+            value = value.to_s.force_encoding('ISO-8859-1').encode('UTF-8', :undef => :replace, :invalid => :replace)
           end
           
           value = prop.typecast(value)
           
         elsif value.kind_of? String
-          value = value.to_s.force_encoding(@options[:encoding]).encode("UTF-8")
+          value = value.to_s.force_encoding('ISO-8859-1').encode('UTF-8', :undef => :replace, :invalid => :replace)
         end
         
         hash[column] = value

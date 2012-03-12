@@ -19,18 +19,33 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
     end
     
     def connection
-      @connection ||= FBSQL_Connect.new(
-        @options[:host],
-        @options[:port], 
-        @options[:database], 
-        @options[:user], 
-        @options[:password], 
-        @options[:dbpassword]
-      )
+      unless @connection
+        LOGGER.debug "Opening connection..."
+        @connection = FBSQL_Connect.new(
+          @options[:host],
+          @options[:port], 
+          @options[:database], 
+          @options[:user], 
+          @options[:password], 
+          @options[:dbpassword]
+        )
+        @connection.input_charset  = encoding_map['UTF-8']
+        @connection.output_charset = encoding_map['ISO-8859-1']
+      end
+      
+      @connection
     end
     
     def query str
+      LOGGER.debug str
       connection.query str
+    end
+    
+    def encoding_map
+      {
+        'ISO-8859-1' => FBSQL_Connect::FBC_ISO8859_1,
+        'UTF-8'      => FBSQL_Connect::FBC_UTF_8
+      }
     end
     
     def describe(table)
@@ -52,6 +67,7 @@ class FrontbaseAdapter < ::DataMapper::Adapters::AbstractAdapter
     end
     
     def close
+      LOGGER.debug "Closing connection..."
       connection.close
       @connection = nil
     end

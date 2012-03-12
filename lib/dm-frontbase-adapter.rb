@@ -10,5 +10,8 @@ end
 ::DataMapper::Adapters::FrontbaseAdapter = FrontbaseAdapter
 ::DataMapper::Adapters.const_added(:FrontbaseAdapter)
 
+LOGGER = DataMapper.logger.dup
+LOGGER.progname = "FrontbaseAdapter"
+
 require 'frontbase'
 require "dm-frontbase-adapter/adapter"
